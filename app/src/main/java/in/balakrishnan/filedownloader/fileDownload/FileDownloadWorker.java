@@ -1,6 +1,7 @@
 package in.balakrishnan.filedownloader.fileDownload;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
@@ -39,8 +40,8 @@ public class FileDownloadWorker extends Worker {
             // These are used for uploading the image
             String url = workerParameters.getInputData().getString(KEY_WORKER_FILE_URL);
             String bucket = workerParameters.getInputData().getString(KEY_WORKER_BUCKET);
-            int total = workerParameters.getInputData().getInt(KEY_WORkER_TOTAL,0);
-            int current = workerParameters.getInputData().getInt(KEY_WORKER_CURRENT,0);
+            int total = workerParameters.getInputData().getInt(KEY_WORkER_TOTAL, 0);
+            int current = workerParameters.getInputData().getInt(KEY_WORKER_CURRENT, 0);
             currentProcessingImage = workerParameters.getInputData().getInt(KEY_WORKER_CURRENT, 0);
             totalCount = workerParameters.getInputData().getInt(KEY_WORkER_TOTAL, 0);
             FileDownloadNetworkHelper.DownloadProgressListener listener = new FileDownloadNetworkHelper.DownloadProgressListener() {
@@ -52,6 +53,7 @@ public class FileDownloadWorker extends Worker {
                     int progress = (int) ((bytesRead * 100) / contentLength);
                     download.setProgress(progress);
                     download.setUrl(url);
+                    Log.d(TAG, "update: " + progress);
                     if (MainActivity.downloadMediatorLiveData != null) {
                         MainActivity.downloadMediatorLiveData.postValue(download);
                     } else {

@@ -55,7 +55,7 @@ public class FileDownloadNetworkHelper {
                 .build();
     }
 
-    public ListenableWorker.Result downloadFile(@NonNull String url,String fileName,String bucketName) {
+    public ListenableWorker.Result downloadFile(@NonNull String url, String fileName, String bucketName) {
         Log.d(TAG, "downloadFile: " + url);
         ResponseBody responseBody = retrofit.create(VideoDownloadInterface.class)
                 .downloadFileByUrlRx(url)
@@ -80,6 +80,41 @@ public class FileDownloadNetworkHelper {
             e.printStackTrace();
             return ListenableWorker.Result.retry();
         }
+    }
+
+    public File downloadFileAnd(String url, String name, String json, DownloadStatus downloadStatus) {
+        Log.d(TAG, "downloadFile: " + url);
+        ResponseBody responseBody = retrofit.create(VideoDownloadInterface.class)
+                .downloadFileByUrlRx(url)
+                .blockingLast();
+        FileLocalCache fileLocalCache = new FileLocalCache(context, FileLocalCache.StorageType.CONTEXT_WRAPPER);
+        File file = fileLocalCache.createFile(name, "", json);
+        try {
+            DataInputStream stream = new DataInputStream(responseBody.byteStream());
+            byte[] buffer = new byte[(int) responseBody.contentLength()];
+            stream.readFully(buffer);
+            stream.close();
+            DataOutputStream fos = null;
+            fos = new DataOutputStream(new FileOutputStream(file));
+            fos.write(buffer);
+            fos.flush();
+            fos.close();
+            downloadStatus.success(file);
+            return file;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            downloadStatus.failure(e);
+        } catch (IOException e) {
+            e.printStackTrace();
+            downloadStatus.failure(e);
+        }
+        return null;
+    }
+
+    public interface DownloadStatus {
+        void success(File file);
+
+        void failure(Throwable s);
     }
 
     public interface DownloadProgressListener {
