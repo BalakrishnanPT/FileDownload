@@ -4,17 +4,11 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.MediatorLiveData;
 
 import java.io.File;
 
-import in.balakrishnan.filedownloader.Storage.LocalData;
-import in.balakrishnan.filedownloader.fileDownload.Download;
-
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-    public static MediatorLiveData<Download> downloadMediatorLiveData = new MediatorLiveData<>();
-    LocalData localData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
